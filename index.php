@@ -13,11 +13,20 @@ if (!empty($_POST)) {
     $name = htmlentities(strip_tags($data['name']));
 
     if ($method == 'search') {
+        $hasRows = false;
+
         $fetch = $db->prepare('SELECT * FROM users WHERE name LIKE :name');
         $fetch->bindValue(':name', "%$name%");
         $rows = $fetch->execute();
-        while ($user = $rows->fetchArray(SQLITE3_ASSOC))
-            var_dump($user);
+        
+        while ($user = $rows->fetchArray(SQLITE3_ASSOC)) {
+            $hasRows = true;
+            echo $user['id'] . "\t|\t" . $user['name'] . "\t|\t" . $user['email'] . "\n";
+        }
+
+        if (!$hasRows) {
+            echo "No Results For the Current Search Param $name";
+        }
     }
 
     exit();
@@ -58,6 +67,11 @@ if (!empty($_POST)) {
 
         for (let btn of buttons) {
             btn.addEventListener('click', submit)
+        }
+
+        document.onkeydown = (ev) => {
+            if (ev.key == 'Enter')
+                ev.preventDefault()
         }
 
         function submit(ev) {
